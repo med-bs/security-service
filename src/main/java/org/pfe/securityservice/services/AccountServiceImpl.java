@@ -4,7 +4,12 @@ import org.pfe.securityservice.entities.AppRole;
 import org.pfe.securityservice.entities.AppUser;
 import org.pfe.securityservice.repositories.AppRoleRepository;
 import org.pfe.securityservice.repositories.AppUserRepository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+
+@Service
+@Transactional
 public class AccountServiceImpl implements AccountService{
 
     private AppUserRepository appUserRepository;
