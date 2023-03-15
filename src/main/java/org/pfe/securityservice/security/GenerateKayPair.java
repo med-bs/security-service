@@ -1,4 +1,4 @@
-package org.pfe.securityservice;
+package org.pfe.securityservice.security;
 
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemWriter;
@@ -15,12 +15,12 @@ public class GenerateKayPair {
         var keyPair=keyPairGenerator.generateKeyPair();
         byte[] pub = keyPair.getPublic().getEncoded();
         byte[] pri = keyPair.getPrivate().getEncoded();
-        PemWriter pemWriterPublic = new PemWriter(new OutputStreamWriter(new FileOutputStream("src/main/resources/certifications/pub.pem")));
+        PemWriter pemWriterPublic = new PemWriter(new OutputStreamWriter(new FileOutputStream("src/main/resources/certifications/public.pem")));
         PemObject pemObjectPublic=new PemObject("PUBLIC KEY",pub);
         pemWriterPublic.writeObject(pemObjectPublic);
         pemWriterPublic.close();
 
-        PemWriter pemWriterPrivate = new PemWriter(new OutputStreamWriter(new FileOutputStream("src/main/resources/certifications/pri.pem")));
+        PemWriter pemWriterPrivate = new PemWriter(new OutputStreamWriter(new FileOutputStream("src/main/resources/certifications/private.pem")));
         PemObject pemObjectPrivate=new PemObject("PRIVATE KEY",pri);
         pemWriterPrivate.writeObject(pemObjectPrivate);
         pemWriterPrivate.close();
