@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configurers.oauth2.ser
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
@@ -28,17 +29,19 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
 
     private RsakeysConfig rsakeysConfig;
+    private PasswordEncoder passwordEncoder;
 
-    public SecurityConfig(RsakeysConfig rsakeysConfig) {
+    public SecurityConfig(RsakeysConfig rsakeysConfig, PasswordEncoder passwordEncoder) {
         this.rsakeysConfig = rsakeysConfig;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Bean
     public UserDetailsService inMemoryUserDetailsManager() {
         return new InMemoryUserDetailsManager(
                 // dans les requette authorisation doit etre code sur base64 (admin:1234)
-                User.withUsername("user1").password("{noop}1234").authorities("USER").build(),
-                User.withUsername("admin").password("{noop}1234").authorities("USER", "ADMIN").build()
+                User.withUsername("user1").password(passwordEncoder.encode("1234")).authorities("USER").build(),
+                User.withUsername("admin").password(passwordEncoder.encode("1234")).authorities("USER", "ADMIN").build()
         );
     }
 
