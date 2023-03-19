@@ -7,13 +7,15 @@ import org.pfe.securityservice.repositories.AppUserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 
 @Service
 @Transactional
 public class AccountServiceImpl implements AccountService{
 
-    private AppUserRepository appUserRepository;
-    private AppRoleRepository appRoleRepository;
+    private final AppUserRepository appUserRepository;
+    private final AppRoleRepository appRoleRepository;
 
     public AccountServiceImpl(AppUserRepository appUserRepository, AppRoleRepository appRoleRepository) {
         this.appUserRepository = appUserRepository;
@@ -21,8 +23,13 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public AppUser newUser(AppUser appUser){
+    public AppUser addNewUser(AppUser appUser){
         return appUserRepository.save(appUser);
+    }
+
+    @Override
+    public List<AppUser> allUsers(){
+        return appUserRepository.findAll();
     }
 
     @Override
@@ -37,8 +44,13 @@ public class AccountServiceImpl implements AccountService{
     }
 
     @Override
-    public AppRole newRole(AppRole appRole) {
+    public AppRole addNewRole(AppRole appRole) {
         return appRoleRepository.save(appRole);
+    }
+
+    @Override
+    public List<AppRole> allRoles(){
+        return appRoleRepository.findAll();
     }
 
     @Override

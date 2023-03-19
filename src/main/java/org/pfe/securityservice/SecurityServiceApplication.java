@@ -1,6 +1,10 @@
 package org.pfe.securityservice;
 
+import org.pfe.securityservice.entities.AppRole;
+import org.pfe.securityservice.entities.AppUser;
 import org.pfe.securityservice.security.RsakeysConfig;
+import org.pfe.securityservice.services.AccountService;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -19,6 +23,18 @@ public class SecurityServiceApplication {
     @Bean
     PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
+    }
+
+
+    @Bean
+    CommandLineRunner start(AccountService accountService, PasswordEncoder passwordEncoder){
+        return args -> {
+            accountService.addNewUser(AppUser.builder().username("admin").password(passwordEncoder.encode("1234")).build());
+            accountService.addNewRole(AppRole.builder().roleName("USER").build());
+            accountService.addNewRole(AppRole.builder().roleName("ADMIN").build());
+            accountService.addRoleToUser("admin","USER");
+            accountService.addRoleToUser("admin","ADMIN");
+        };
     }
 
 }
