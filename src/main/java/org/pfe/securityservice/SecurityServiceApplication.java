@@ -29,11 +29,22 @@ public class SecurityServiceApplication {
     @Bean
     CommandLineRunner start(AccountService accountService, PasswordEncoder passwordEncoder){
         return args -> {
-            accountService.addNewUser(AppUser.builder().username("admin").password(passwordEncoder.encode("1234")).build());
-            accountService.addNewRole(AppRole.builder().roleName("USER").build());
-            accountService.addNewRole(AppRole.builder().roleName("ADMIN").build());
-            accountService.addRoleToUser("admin","USER");
-            accountService.addRoleToUser("admin","ADMIN");
+            if(accountService.allUsers().isEmpty()){
+                accountService.addNewUser(AppUser.builder().username("admin")
+                        .password(passwordEncoder.encode("root")).build());
+                accountService.addNewUser(AppUser.builder().username("user")
+                        .password(passwordEncoder.encode("1234")).build());
+            }
+
+            if(accountService.allRoles().isEmpty()) {
+                accountService.addNewRole(AppRole.builder().roleName("USER").build());
+                accountService.addNewRole(AppRole.builder().roleName("ADMIN").build());
+
+                accountService.addRoleToUser("admin","USER");
+                accountService.addRoleToUser("admin","ADMIN");
+                accountService.addRoleToUser("user","USER");
+            }
+
         };
     }
 

@@ -32,7 +32,6 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 
 import java.util.Collection;
@@ -50,16 +49,6 @@ public class SecurityConfig {
         this.rsakeysConfig = rsakeysConfig;
         this.passwordEncoder = passwordEncoder;
     }
-
-    @Bean
-    public UserDetailsService inMemoryUserDetailsManager() {
-        return new InMemoryUserDetailsManager(
-                // dans les requette authorisation doit etre code sur base64 (admin:1234)
-                User.withUsername("user1").password(passwordEncoder.encode("1234")).authorities("USER").build(),
-                User.withUsername("admin").password(passwordEncoder.encode("1234")).authorities("USER", "ADMIN").build()
-        );
-    }
-
 
     @Bean
     public AuthenticationManager authenticationManager(UserDetailsService userDetailsService){
@@ -90,7 +79,6 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeRequests(auth->auth.antMatchers("/token/**").permitAll())
-                .authorizeRequests(auth->auth.antMatchers("/user/**").permitAll())
                 .authorizeRequests(auth -> auth.anyRequest().authenticated())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
