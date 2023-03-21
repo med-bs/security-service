@@ -21,5 +21,5 @@ public class AppUser {
     @Column(unique=true)
     private String email;
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<AppRole> appRoles;
+    private List<AppRole> appRoles ;
 }

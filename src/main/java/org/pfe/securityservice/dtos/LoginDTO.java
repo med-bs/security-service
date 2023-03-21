@@ -1,7 +1,7 @@
 package org.pfe.securityservice.dtos;
 
 
-public record LoginRequest(
+public record LoginDTO(
         String grantType,
         String username,
         String password,

@@ -42,14 +42,19 @@ import java.util.stream.Collectors;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
-    private final RsakeysConfig rsakeysConfig;
+    private final RSAkeysConfig rsakeysConfig;
     private final PasswordEncoder passwordEncoder;
 
-    public SecurityConfig(RsakeysConfig rsakeysConfig, PasswordEncoder passwordEncoder) {
+    public SecurityConfig(RSAkeysConfig rsakeysConfig, PasswordEncoder passwordEncoder) {
         this.rsakeysConfig = rsakeysConfig;
         this.passwordEncoder = passwordEncoder;
     }
 
+    /**
+     * set the password encoder and user details service to daoAuthProvider
+     * @param userDetailsService user from databases
+     * @return auth provider manager
+     */
     @Bean
     public AuthenticationManager authenticationManager(UserDetailsService userDetailsService){
         var daoAuthProvider = new DaoAuthenticationProvider();
@@ -58,6 +63,10 @@ public class SecurityConfig {
         return new ProviderManager(daoAuthProvider);
     }
 
+    /**
+     * create user details from databses
+     * @return user details service
+     */
     @Bean
     public UserDetailsService userDetailsService(){
         return new UserDetailsService() {
@@ -68,17 +77,24 @@ public class SecurityConfig {
             public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
                 AppUser appUser=accountService.findByUserName(username);
                 if (appUser==null) throw new UsernameNotFoundException("User not found");
-                Collection<GrantedAuthority> authorities=appUser.getAppRoles().stream().map(r->new SimpleGrantedAuthority(r.getRoleName())).collect(Collectors.toList());
+                Collection<GrantedAuthority> authorities=appUser.getAppRoles().stream().map(role->new SimpleGrantedAuthority(role.getRoleName())).collect(Collectors.toList());
                 return new User(username,appUser.getPassword(),authorities);
             }
         };
     }
 
+    /**
+     * permit requerst for login and signup other route need authorithation
+     * @param httpSecurity HttpSecurity
+     * @return HttpSecurity
+     * @throws Exception exception
+     */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf(AbstractHttpConfigurer::disable)
-                .authorizeRequests(auth->auth.antMatchers("/token/**").permitAll())
+                .authorizeRequests(auth->auth.antMatchers("/api/v2/login").permitAll())
+                .authorizeRequests(auth->auth.antMatchers("/api/v2/signup").permitAll())
                 .authorizeRequests(auth -> auth.anyRequest().authenticated())
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
@@ -86,11 +102,19 @@ public class SecurityConfig {
                 .build();
     }
 
+    /**
+     * decode token with RSA algo
+     * @return JwtDecoder
+     */
     @Bean
     JwtDecoder jwtDecoder() {
         return NimbusJwtDecoder.withPublicKey(rsakeysConfig.publicKey()).build();
     }
 
+    /**
+     * encode token with RSA algo
+     * @return JwtEncoder
+     */
     @Bean
     JwtEncoder jwtEncoder() {
         JWK jwk = new RSAKey.Builder(rsakeysConfig.publicKey()).privateKey(rsakeysConfig.privateKey()).build();

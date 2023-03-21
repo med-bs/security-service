@@ -2,7 +2,7 @@ package org.pfe.securityservice;
 
 import org.pfe.securityservice.entities.AppRole;
 import org.pfe.securityservice.entities.AppUser;
-import org.pfe.securityservice.security.RsakeysConfig;
+import org.pfe.securityservice.security.RSAkeysConfig;
 import org.pfe.securityservice.services.AccountService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -12,8 +12,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.List;
+
 @SpringBootApplication
-@EnableConfigurationProperties(RsakeysConfig.class)
+@EnableConfigurationProperties(RSAkeysConfig.class)
 public class SecurityServiceApplication {
 
     public static void main(String[] args) {
@@ -40,9 +42,8 @@ public class SecurityServiceApplication {
                 accountService.addNewRole(AppRole.builder().roleName("USER").build());
                 accountService.addNewRole(AppRole.builder().roleName("ADMIN").build());
 
-                accountService.addRoleToUser("admin","USER");
-                accountService.addRoleToUser("admin","ADMIN");
-                accountService.addRoleToUser("user","USER");
+                accountService.addRolesToUser("admin", List.of("USER","ADMIN"));
+                accountService.addRolesToUser("user",List.of("USER"));
             }
 
         };
