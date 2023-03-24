@@ -29,13 +29,11 @@ public class SecurityServiceApplication {
 
 
     @Bean
-    CommandLineRunner start(AccountService accountService, PasswordEncoder passwordEncoder){
+    CommandLineRunner start(AccountService accountService){
         return args -> {
             if(accountService.allUsers().isEmpty()){
-                accountService.addNewUser(AppUser.builder().username("admin")
-                        .password(passwordEncoder.encode("root")).build());
-                accountService.addNewUser(AppUser.builder().username("user")
-                        .password(passwordEncoder.encode("1234")).build());
+                accountService.addNewUser(AppUser.builder().username("admin").password("root").build());
+                accountService.addNewUser(AppUser.builder().username("user").password("1234").build());
             }
 
             if(accountService.allRoles().isEmpty()) {

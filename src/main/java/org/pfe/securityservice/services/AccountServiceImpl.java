@@ -5,6 +5,7 @@ import org.pfe.securityservice.entities.AppUser;
 import org.pfe.securityservice.repositories.AppRoleRepository;
 import org.pfe.securityservice.repositories.AppUserRepository;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
@@ -19,23 +20,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-
 @Service
 @Transactional
 public class AccountServiceImpl implements AccountService{
 
     private final AppUserRepository appUserRepository;
     private final AppRoleRepository appRoleRepository;
+    private final PasswordEncoder passwordEncoder;
     private final JwtEncoder jwtEncoder;
 
-    public AccountServiceImpl(AppUserRepository appUserRepository, AppRoleRepository appRoleRepository, JwtEncoder jwtEncoder) {
+    public AccountServiceImpl(AppUserRepository appUserRepository, AppRoleRepository appRoleRepository, PasswordEncoder passwordEncoder, JwtEncoder jwtEncoder) {
         this.appUserRepository = appUserRepository;
         this.appRoleRepository = appRoleRepository;
+        this.passwordEncoder = passwordEncoder;
         this.jwtEncoder = jwtEncoder;
     }
 
     @Override
     public AppUser addNewUser(AppUser appUser){
+        appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
         return appUserRepository.save(appUser);
     }
 
@@ -47,6 +50,7 @@ public class AccountServiceImpl implements AccountService{
     @Override
     public AppUser updateUser(AppUser appUser,String username){
         appUser.setUsername(username);
+        appUser.setPassword(passwordEncoder.encode(appUser.getPassword()));
         return appUserRepository.save(appUser);
     }
 
@@ -80,9 +84,9 @@ public class AccountServiceImpl implements AccountService{
     public Map<String,String> generateJwtToken(String username, Collection<? extends GrantedAuthority> authorities, boolean withRefreshToken){
         Map<String,String> idToken=new HashMap<>();
         Instant instant=Instant.now();
-        String scope=authorities.stream()
+        List<String> scope=authorities.stream()
                 .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(" "));
+                .collect(Collectors.toList());
         JwtClaimsSet jwtClaimsSet=JwtClaimsSet.builder()
                 .issuer("auth-service")
                 .issuedAt(instant)
