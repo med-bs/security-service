@@ -9,10 +9,6 @@ import java.io.OutputStreamWriter;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 
-/**
- *
- *
- */
 public class GenerateKayPair {
 
     public static void main(String[] args) throws NoSuchAlgorithmException, IOException {
