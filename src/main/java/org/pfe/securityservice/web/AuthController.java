@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v2")
+@CrossOrigin("*")
 public class AuthController {
     private final AccountService accountService;
     private final JwtDecoder jwtDecoder;

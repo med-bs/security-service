@@ -16,6 +16,7 @@ public class AppUser {
     private Long id;
     @Column(unique=true)
     private String username;
+    private String name;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
     @Column(unique=true)

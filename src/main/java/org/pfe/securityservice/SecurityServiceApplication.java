@@ -32,8 +32,8 @@ public class SecurityServiceApplication {
     CommandLineRunner start(AccountService accountService){
         return args -> {
             if(accountService.allUsers().isEmpty()){
-                accountService.addNewUser(AppUser.builder().username("admin").password("root").build());
-                accountService.addNewUser(AppUser.builder().username("user").password("1234").build());
+                accountService.addNewUser(AppUser.builder().username("admin").password("root").name("Mohamed Ben Salem").build());
+                accountService.addNewUser(AppUser.builder().username("user").password("1234").name("Mohamed Amine Ben Salem").build());
             }
 
             if(accountService.allRoles().isEmpty()) {

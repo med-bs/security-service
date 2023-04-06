@@ -1,5 +1,6 @@
 package org.pfe.securityservice.services;
 
+import lombok.AllArgsConstructor;
 import org.pfe.securityservice.entities.AppRole;
 import org.pfe.securityservice.entities.AppUser;
 import org.pfe.securityservice.repositories.AppRoleRepository;
@@ -22,19 +23,13 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
+@AllArgsConstructor
 public class AccountServiceImpl implements AccountService{
 
     private final AppUserRepository appUserRepository;
     private final AppRoleRepository appRoleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtEncoder jwtEncoder;
-
-    public AccountServiceImpl(AppUserRepository appUserRepository, AppRoleRepository appRoleRepository, PasswordEncoder passwordEncoder, JwtEncoder jwtEncoder) {
-        this.appUserRepository = appUserRepository;
-        this.appRoleRepository = appRoleRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtEncoder = jwtEncoder;
-    }
 
     @Override
     public AppUser addNewUser(AppUser appUser){
@@ -84,6 +79,7 @@ public class AccountServiceImpl implements AccountService{
     public Map<String,String> generateJwtToken(String username, Collection<? extends GrantedAuthority> authorities, boolean withRefreshToken){
         Map<String,String> idToken=new HashMap<>();
         Instant instant=Instant.now();
+        AppUser appUser = appUserRepository.findByUsername(username);
         List<String> scope=authorities.stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
@@ -92,6 +88,7 @@ public class AccountServiceImpl implements AccountService{
                 .issuedAt(instant)
                 .expiresAt(instant.plus(withRefreshToken?5:30, ChronoUnit.MINUTES))
                 .subject(username)
+                .claim("name",appUser.getName())
                 .claim("scope",scope)
                 .build();
         String accessToken = this.jwtEncoder.encode(JwtEncoderParameters.from(jwtClaimsSet)).getTokenValue();
